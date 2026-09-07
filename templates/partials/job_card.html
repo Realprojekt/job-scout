@@ -1,0 +1,26 @@
+<article class="job-card status-{{ job.status.value }}" id="job-{{ job.id }}">
+    <div class="job-card-header">
+        <a class="job-title" href="{{ job.url }}" target="_blank" rel="noopener noreferrer">{{ job.title }}</a>
+        <select
+            name="status"
+            hx-post="/jobs/{{ job.id }}/status"
+            hx-trigger="change"
+            hx-target="#job-{{ job.id }}"
+            hx-swap="outerHTML"
+        >
+            {% for s in ["new", "interessant", "beworben", "abgelehnt"] %}
+            <option value="{{ s }}" {% if job.status.value == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <p class="job-meta">
+        {{ job.company }}{% if job.location %} &middot; {{ job.location }}{% endif %}
+    </p>
+    <div class="job-badges">
+        <span class="badge badge-source">{{ job.source }}</span>
+        {% if job.remote %}<span class="badge badge-remote">remote</span>{% endif %}
+        {% if job.distance_km is not none %}<span class="badge badge-distance">{{ job.distance_km }} km</span>{% endif %}
+        {% if job.posted_at %}<span class="badge badge-date">{{ job.posted_at.strftime("%d.%m.%Y") }}</span>{% endif %}
+    </div>
+    <p class="job-description">{{ job.description[:280] }}{% if job.description|length > 280 %}&hellip;{% endif %}</p>
+</article>
