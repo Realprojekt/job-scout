@@ -1,5 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
+<section class="toolbar location-form">
+    <input
+        type="text"
+        name="home_location"
+        value="{{ home_location }}"
+        placeholder="City or postal code"
+        required
+    >
+    <input
+        type="number"
+        name="radius_km"
+        value="{{ radius_km }}"
+        min="1"
+        step="1"
+        placeholder="Radius (km)"
+        required
+    >
+    <button
+        hx-post="/settings/location"
+        hx-include="[name='home_location'],[name='radius_km']"
+        hx-target="#job-list"
+        hx-indicator="#location-indicator"
+    >Save &amp; refresh</button>
+    <span id="location-indicator" class="htmx-indicator">updating location and fetching jobs...</span>
+</section>
+
 <section class="toolbar">
     <input
         type="search"

@@ -6,6 +6,7 @@ from app.config import get_settings
 from app.database import engine
 from app.geocode import geocode, haversine_km
 from app.models import Job
+from app.settings_store import get_location_settings
 from app.sources.adzuna import AdzunaSource
 from app.sources.arbeitnow import ArbeitnowSource
 from app.sources.base import RawJob
@@ -13,15 +14,15 @@ from app.sources.base import RawJob
 logger = logging.getLogger("job-scout.fetcher")
 
 
-def _build_sources(settings, keywords: list[str]):
+def _build_sources(settings, keywords: list[str], home_location: str, radius_km: float):
     return [
         ArbeitnowSource(keywords=keywords),
         AdzunaSource(
             app_id=settings.adzuna_app_id,
             app_key=settings.adzuna_app_key,
             country=settings.adzuna_country,
-            where=settings.home_location,
-            distance_km=settings.radius_km,
+            where=home_location,
+            distance_km=radius_km,
             queries=settings.adzuna_query_list,
             keywords=keywords,
         ),
@@ -46,11 +47,12 @@ def fetch_all_jobs() -> int:
     new_count = 0
 
     with Session(engine) as session:
-        home_coords = geocode(settings.home_location, session, settings.nominatim_user_agent, settings.adzuna_country)
+        location = get_location_settings(session)
+        home_coords = geocode(location.home_location, session, settings.nominatim_user_agent, settings.adzuna_country)
         if home_coords is None:
-            logger.warning("Could not geocode HOME_LOCATION=%r; radius filtering disabled, only remote jobs will be kept", settings.home_location)
+            logger.warning("Could not geocode HOME_LOCATION=%r; radius filtering disabled, only remote jobs will be kept", location.home_location)
 
-        for source in _build_sources(settings, keywords):
+        for source in _build_sources(settings, keywords, location.home_location, location.radius_km):
             try:
                 raw_jobs = source.fetch()
             except Exception:
@@ -59,7 +61,7 @@ def fetch_all_jobs() -> int:
 
             for raw in raw_jobs:
                 distance = _resolve_distance(raw, home_coords, session, settings)
-                within_radius = distance is not None and distance <= settings.radius_km
+                within_radius = distance is not None and distance <= location.radius_km
                 is_remote_ok = settings.include_remote and raw.remote
                 if not (within_radius or is_remote_ok):
                     continue

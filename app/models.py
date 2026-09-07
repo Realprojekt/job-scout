@@ -33,3 +33,11 @@ class GeoCache(SQLModel, table=True):
     query: str = Field(primary_key=True)
     lat: float
     lon: float
+
+
+class AppSettings(SQLModel, table=True):
+    """Singleton row (id=1) holding user-adjustable settings that override the .env defaults."""
+
+    id: int = Field(default=1, primary_key=True)
+    home_location: str
+    radius_km: float

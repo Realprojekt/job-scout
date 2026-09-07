@@ -1,3 +1,6 @@
+{% if home_location %}
+<p class="location-info">Showing jobs within {{ radius_km|int }} km of {{ home_location }} (plus remote)</p>
+{% endif %}
 <div class="job-grid">
     {% for job in jobs %}
         {% include "partials/job_card.html" %}

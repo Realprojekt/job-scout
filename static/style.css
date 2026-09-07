@@ -49,6 +49,11 @@ main { padding: 1.5rem 2rem 3rem; max-width: 1200px; margin: 0 auto; }
 
 .toolbar input[type="search"] { flex: 1; min-width: 200px; }
 
+.location-form input[name="home_location"] { flex: 1; min-width: 160px; }
+.location-form input[name="radius_km"] { width: 110px; }
+
+.location-info { color: var(--muted); font-size: 0.85rem; margin: 0 0 1rem; }
+
 .toolbar button {
     background: var(--accent);
     color: #0f172a;
