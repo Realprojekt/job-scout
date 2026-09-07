@@ -22,10 +22,13 @@ class with a `fetch()` method (see `app/sources/base.py`).
   `FETCH_INTERVAL_MINUTES` (default: 60).
 - Jobs without coordinates (Arbeitnow) are geocoded via
   [Nominatim](https://nominatim.org/) (OpenStreetMap) to compute the
-  distance to `HOME_LOCATION`; Adzuna provides coordinates directly.
-- Listings are shown if they're within `RADIUS_KM` **or** marked as remote
-  (see `INCLUDE_REMOTE`).
+  distance to your home location; Adzuna provides coordinates directly.
+- Listings are shown if they're within the configured radius **or** marked
+  as remote (see `INCLUDE_REMOTE`).
 - Jobs already seen (`source` + `external_id`) are not inserted again.
+- `HOME_LOCATION` / `RADIUS_KM` in `.env` are just the initial defaults —
+  both can be changed anytime from the dashboard ("Save & refresh"), which
+  persists them to the database and immediately re-fetches jobs.
 
 ## Setup (local)
 
