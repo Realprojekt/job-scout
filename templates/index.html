@@ -4,20 +4,20 @@
     <input
         type="search"
         name="q"
-        placeholder="Suche (Titel, Firma, Ort)..."
+        placeholder="Search (title, company, location)..."
         hx-get="/partials/jobs"
         hx-trigger="keyup changed delay:300ms"
         hx-target="#job-list"
         hx-include="[name='status'],[name='source']"
     >
     <select name="status" hx-get="/partials/jobs" hx-trigger="change" hx-target="#job-list" hx-include="[name='q'],[name='source']">
-        <option value="">Alle Status</option>
+        <option value="">All statuses</option>
         {% for s in statuses %}
         <option value="{{ s.value }}">{{ s.value }}</option>
         {% endfor %}
     </select>
     <select name="source" hx-get="/partials/jobs" hx-trigger="change" hx-target="#job-list" hx-include="[name='q'],[name='status']">
-        <option value="">Alle Quellen</option>
+        <option value="">All sources</option>
         <option value="arbeitnow">Arbeitnow</option>
         <option value="adzuna">Adzuna</option>
     </select>
@@ -25,8 +25,8 @@
         hx-post="/fetch"
         hx-target="#job-list"
         hx-indicator="#fetch-indicator"
-    >Jetzt aktualisieren</button>
-    <span id="fetch-indicator" class="htmx-indicator">l&auml;dt neue Jobs (kann etwas dauern)...</span>
+    >Refresh now</button>
+    <span id="fetch-indicator" class="htmx-indicator">loading new jobs (may take a moment)...</span>
 </section>
 
 <div id="job-list">

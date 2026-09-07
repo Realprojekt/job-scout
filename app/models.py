@@ -6,9 +6,9 @@ from sqlmodel import Field, SQLModel, UniqueConstraint
 
 class JobStatus(str, Enum):
     new = "new"
-    interessant = "interessant"
-    beworben = "beworben"
-    abgelehnt = "abgelehnt"
+    interested = "interested"
+    applied = "applied"
+    rejected = "rejected"
 
 
 class Job(SQLModel, table=True):

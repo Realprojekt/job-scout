@@ -8,7 +8,7 @@
             hx-target="#job-{{ job.id }}"
             hx-swap="outerHTML"
         >
-            {% for s in ["new", "interessant", "beworben", "abgelehnt"] %}
+            {% for s in ["new", "interested", "applied", "rejected"] %}
             <option value="{{ s }}" {% if job.status.value == s %}selected{% endif %}>{{ s }}</option>
             {% endfor %}
         </select>
@@ -20,7 +20,7 @@
         <span class="badge badge-source">{{ job.source }}</span>
         {% if job.remote %}<span class="badge badge-remote">remote</span>{% endif %}
         {% if job.distance_km is not none %}<span class="badge badge-distance">{{ job.distance_km }} km</span>{% endif %}
-        {% if job.posted_at %}<span class="badge badge-date">{{ job.posted_at.strftime("%d.%m.%Y") }}</span>{% endif %}
+        {% if job.posted_at %}<span class="badge badge-date">{{ job.posted_at.strftime("%Y-%m-%d") }}</span>{% endif %}
     </div>
     <p class="job-description">{{ job.description[:280] }}{% if job.description|length > 280 %}&hellip;{% endif %}</p>
 </article>

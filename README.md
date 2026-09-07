@@ -1,35 +1,33 @@
 # job-scout
 
-Ein selbst gehostetes Tool, das Junior-Developer-Stellenangebote aus mehreren
-Quellen sammelt, nach Umkreis und Stichwort filtert und in einem einfachen
-Dashboard anzeigt — inklusive Status-Tracking (neu / interessant / beworben /
-abgelehnt) pro Angebot. Beworben wird weiterhin direkt bei der Quelle; dieses
-Tool ersetzt keine Bewerbungsplattform, sondern bündelt nur die Übersicht.
+A self-hosted tool that collects junior developer job listings from multiple
+sources, filters them by radius and keyword, and shows them in a simple
+dashboard with per-listing status tracking (new / interested / applied /
+rejected). You still apply directly on the source site — this tool only
+bundles the overview, it doesn't replace an application platform.
 
-## Datenquellen
+## Data sources
 
-- [Arbeitnow](https://www.arbeitnow.com/api/job-board-api) — kostenlos, kein API-Key nötig
-- [Adzuna](https://developer.adzuna.com/) — kostenloser API-Key nötig (Registrierung), aggregiert u. a. Indeed-Daten
+- [Arbeitnow](https://www.arbeitnow.com/api/job-board-api) — free, no API key needed
+- [Adzuna](https://developer.adzuna.com/) — free API key required (sign up), aggregates data from sources including Indeed
 
-Weitere Quellen (z. B. direktes Scraping von Indeed/Instaffo) sind bewusst
-nicht enthalten, da beide in ihren Nutzungsbedingungen automatisiertes
-Scraping untersagen. `app/sources/` ist so aufgebaut, dass eine weitere
-Quelle nur eine neue Klasse mit einer `fetch()`-Methode braucht (siehe
-`app/sources/base.py`).
+Other sources (e.g. scraping Indeed/Instaffo directly) are intentionally not
+included, since both prohibit automated scraping in their terms of service.
+`app/sources/` is structured so that adding a new source only requires a new
+class with a `fetch()` method (see `app/sources/base.py`).
 
-## Funktionsweise
+## How it works
 
-- Ein Scheduler holt beim Start und danach alle `FETCH_INTERVAL_MINUTES`
-  automatisch neue Jobs (Standard: 60 Min).
-- Jobs ohne Koordinaten (Arbeitnow) werden per [Nominatim](https://nominatim.org/)
-  (OpenStreetMap) geokodiert und die Distanz zu `HOME_LOCATION` berechnet;
-  Adzuna liefert Koordinaten direkt mit.
-- Angebote werden angezeigt, wenn sie innerhalb von `RADIUS_KM` liegen
-  **oder** als Remote markiert sind (siehe `INCLUDE_REMOTE`).
-- Bereits gesehene Jobs (`source` + `external_id`) werden nicht erneut
-  eingefügt.
+- A scheduler fetches new jobs on startup and then every
+  `FETCH_INTERVAL_MINUTES` (default: 60).
+- Jobs without coordinates (Arbeitnow) are geocoded via
+  [Nominatim](https://nominatim.org/) (OpenStreetMap) to compute the
+  distance to `HOME_LOCATION`; Adzuna provides coordinates directly.
+- Listings are shown if they're within `RADIUS_KM` **or** marked as remote
+  (see `INCLUDE_REMOTE`).
+- Jobs already seen (`source` + `external_id`) are not inserted again.
 
-## Setup (lokal)
+## Setup (local)
 
 ```bash
 python -m venv .venv
@@ -38,8 +36,8 @@ pip install -r requirements.txt
 copy .env.example .env
 ```
 
-`.env` anpassen (mindestens `HOME_LOCATION`, `RADIUS_KM`; für Adzuna-Ergebnisse
-zusätzlich `ADZUNA_APP_ID` / `ADZUNA_APP_KEY` von https://developer.adzuna.com/ eintragen).
+Edit `.env` (at minimum `HOME_LOCATION`, `RADIUS_KM`; for Adzuna results
+also set `ADZUNA_APP_ID` / `ADZUNA_APP_KEY` from https://developer.adzuna.com/).
 
 ```bash
 uvicorn app.main:app --reload
@@ -54,19 +52,18 @@ copy .env.example .env
 docker compose up -d --build
 ```
 
-Die SQLite-Datenbank liegt persistent in `./data/jobs.db`.
+The SQLite database persists in `./data/jobs.db`.
 
-## Hinweise
+## Notes
 
-- Ohne Adzuna-Keys laufen nur Arbeitnow-Ergebnisse (die Quelle liefert keine
-  Fehler, sondern einfach keine Adzuna-Treffer).
-- Nominatim erlaubt maximal 1 Anfrage/Sekunde — bei sehr vielen neuen,
-  unterschiedlichen Arbeitnow-Standorten kann ein manuelles "Jetzt
-  aktualisieren" dadurch etwas dauern.
-- Adzunas `distance`-Parameter ist nicht ganz eindeutig dokumentiert
-  (Meilen vs. km). Falls der Umkreis spürbar falsch wirkt, `RADIUS_KM`
-  anpassen oder in der [Adzuna-API-Doku](https://developer.adzuna.com/docs/search) nachsehen.
+- Without Adzuna keys, only Arbeitnow results show up (that source doesn't
+  error, it just returns no Adzuna matches).
+- Nominatim allows at most 1 request/second — with many new, distinct
+  Arbeitnow locations, a manual "Refresh now" can take a bit longer.
+- Adzuna's `distance` parameter unit isn't clearly documented (miles vs.
+  km). If the radius feels noticeably off, adjust `RADIUS_KM` or check the
+  [Adzuna API docs](https://developer.adzuna.com/docs/search).
 
-## Tech-Stack
+## Tech stack
 
 Python · FastAPI · SQLModel (SQLite) · APScheduler · HTMX · Jinja2
